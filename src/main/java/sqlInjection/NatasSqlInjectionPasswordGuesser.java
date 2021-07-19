@@ -1,5 +1,7 @@
 package sqlInjection;
 
+import responseReader.HttpURLConnectionResponseReader;
+import responseReader.NatasHttpUrlConnectionResponseReader;
 import sqlInjection.utils.SqlInjectionUtils;
 import util.XwwwFormUrlEncoder;
 
@@ -17,6 +19,8 @@ import java.util.zip.GZIPInputStream;
 public class NatasSqlInjectionPasswordGuesser extends AbstractSqlInjectionPasswordGuesser {
 
     private static final String USER_EXISTS = "This user exists.";
+    private static final HttpURLConnectionResponseReader RESPONSE_READER =
+            new NatasHttpUrlConnectionResponseReader(807);
 
     public NatasSqlInjectionPasswordGuesser(int passwordLength,
                                             OutputStream progressOutputStream) {
@@ -40,27 +44,9 @@ public class NatasSqlInjectionPasswordGuesser extends AbstractSqlInjectionPasswo
     @Override
     protected boolean isGuessSuccessful(String body) throws Throwable {
         HttpURLConnection connection = getUrlConnection(body);
-        StringBuilder stringBuilder = new StringBuilder(1024);
-        if ("gzip".equals(connection.getContentEncoding())) {
-            try (GZIPInputStream gzipInputStream = new GZIPInputStream(connection.getInputStream());
-                 InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream);
-                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-                bufferedReader.skip(807);
-                while (true) {
-                    int ch = bufferedReader.read();
-                    if (ch == -1) {
-                        break;
-                    }
-                    char next = (char) ch;
-                    if(next == '<'){
-                        break;
-                    }
-                    stringBuilder.append(next);
-                }
-            }
-        }
+        String response = RESPONSE_READER.read(connection);
         connection.disconnect();
-        return stringBuilder.toString().equals(USER_EXISTS);
+        return response.equals(USER_EXISTS);
     }
 
     @Override

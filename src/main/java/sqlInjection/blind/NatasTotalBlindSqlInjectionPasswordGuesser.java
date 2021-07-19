@@ -1,6 +1,6 @@
 package sqlInjection.blind;
 
-import sqlInjection.responseReader.HttpURLConnectionResponseReader;
+import responseReader.HttpURLConnectionResponseReader;
 import sqlInjection.utils.SqlInjectionUtils;
 import util.XwwwFormUrlEncoder;
 

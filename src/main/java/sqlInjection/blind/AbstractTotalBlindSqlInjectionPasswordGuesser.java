@@ -1,6 +1,6 @@
 package sqlInjection.blind;
 
-import sqlInjection.responseReader.HttpURLConnectionResponseReader;
+import responseReader.HttpURLConnectionResponseReader;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;

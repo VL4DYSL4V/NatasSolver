@@ -1,4 +1,4 @@
-package sqlInjection.responseReader;
+package responseReader;
 
 import java.net.HttpURLConnection;
 
