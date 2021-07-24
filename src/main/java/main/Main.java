@@ -1,14 +1,15 @@
 package main;
 
 import sessionHijacking.IntegerCookieValueGuesser;
+import sessionHijacking.NatasHexCookieValueGuesser;
 import sessionHijacking.NatasIntegerCookieValueGuesser;
 
 public class Main {
 
     public static void main(String[] args) throws Throwable {
         IntegerCookieValueGuesser integerCookieValueGuesser =
-                new NatasIntegerCookieValueGuesser(0, 640);
-        integerCookieValueGuesser.doSessionHijacking(System.out::println);
+                new NatasHexCookieValueGuesser(0, 640);
+        integerCookieValueGuesser.doSessionHijacking();
     }
 
 }

