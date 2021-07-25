@@ -1,15 +1,13 @@
 package main;
 
-import sessionHijacking.IntegerCookieValueGuesser;
-import sessionHijacking.NatasHexCookieValueGuesser;
-import sessionHijacking.NatasIntegerCookieValueGuesser;
+import cipherCracking.CaesarCracker;
 
 public class Main {
 
     public static void main(String[] args) throws Throwable {
-        IntegerCookieValueGuesser integerCookieValueGuesser =
-                new NatasHexCookieValueGuesser(0, 640);
-        integerCookieValueGuesser.doSessionHijacking();
+        for(int i = 0; i < 26; i++){
+            System.out.println(CaesarCracker.decodeIgnoringWhitespace("OMQEMDUEQMEK", i));
+        }
     }
 
 }
